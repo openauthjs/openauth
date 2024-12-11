@@ -1,5 +1,11 @@
 # @openauthjs/openauth
 
+## 0.0.23
+
+### Patch Changes
+
+- a585875: remove console.log
+
 ## 0.0.22
 
 ### Patch Changes
