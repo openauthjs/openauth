@@ -41,6 +41,7 @@ import { UnknownStateError } from "../error.js"
 import { Storage } from "../storage/storage.js"
 import { Provider } from "./provider.js"
 import { generateUnbiasedDigits, timingSafeCompare } from "../random.js"
+import { v1 } from "@standard-schema/spec"
 
 /**
  * @internal
@@ -125,6 +126,21 @@ export interface PasswordConfig {
    * ```
    */
   sendCode: (email: string, code: string) => Promise<void>
+  /**
+   * Callback to validate the password on sign up and password reset.
+   *
+   * @example
+   * ```ts
+   * {
+   *   validatePassword: (password) => {
+   *      return password.length < 8 ? "Password must be at least 8 characters" : undefined
+   *   }
+   * }
+   * ```
+   */
+  validatePassword?:
+    | v1.StandardSchema
+    | ((password: string) => Promise<string | undefined> | string | undefined)
 }
 
 /**
@@ -172,6 +188,10 @@ export type PasswordRegisterError =
     }
   | {
       type: "password_mismatch"
+    }
+  | {
+      type: "validation_error"
+      message?: string
     }
 
 /**
@@ -222,6 +242,10 @@ export type PasswordChangeError =
     }
   | {
       type: "password_mismatch"
+    }
+  | {
+      type: "validation_error"
+      message: string
     }
 
 /**
@@ -321,6 +345,31 @@ export function PasswordProvider(
             return transition(provider, { type: "invalid_password" })
           if (password !== repeat)
             return transition(provider, { type: "password_mismatch" })
+          if (config.validatePassword) {
+            let validationError: string | undefined
+            try {
+              if (typeof config.validatePassword === "function") {
+                validationError = await config.validatePassword(password)
+              } else {
+                const res =
+                  await config.validatePassword["~standard"].validate(password)
+
+                if (res.issues?.length) {
+                  throw new Error(
+                    res.issues.map((issue) => issue.message).join(", "),
+                  )
+                }
+              }
+            } catch (error) {
+              validationError =
+                error instanceof Error ? error.message : undefined
+            }
+            if (validationError)
+              return transition(provider, {
+                type: "validation_error",
+                message: validationError,
+              })
+          }
           const existing = await Storage.get(ctx.storage, [
             "email",
             email,
@@ -334,6 +383,17 @@ export function PasswordProvider(
             code,
             password: await hasher.hash(password),
             email,
+          })
+        }
+
+        if (action === "register" && provider.type === "code") {
+          const code = generate()
+          await config.sendCode(provider.email, code)
+          return transition({
+            type: "code",
+            code,
+            password: provider.password,
+            email: provider.email,
           })
         }
 

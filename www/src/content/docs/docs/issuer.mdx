@@ -39,7 +39,7 @@ import { PasswordProvider } from "@openauthjs/openauth/provider/password"
 
 const app = issuer({
   providers: {
-    github: GithubAdapter({
+    github: GithubProvider({
       // ...
     }),
     password: PasswordProvider({
@@ -163,6 +163,8 @@ Create an OpenAuth server, a Hono app.
 - <p>[<code class="key">ttl?</code>](#issuerinput.ttl) <code class="primitive">Object</code></p>
   - <p>[<code class="key">access?</code>](#ttl.access) <code class="primitive">number</code></p>
   - <p>[<code class="key">refresh?</code>](#ttl.refresh) <code class="primitive">number</code></p>
+  - <p>[<code class="key">retention?</code>](#ttl.retention) <code class="primitive">number</code></p>
+  - <p>[<code class="key">reuse?</code>](#ttl.reuse) <code class="primitive">number</code></p>
 - <p>[<code class="key">allow?</code>](#issuerinput.allow) <code class="primitive">(input: <code class="symbol">&lcub; </code><code class="key">audience</code><code class="symbol">&colon; </code><code class="primitive">string</code><code class="symbol">, </code><code class="key">clientID</code><code class="symbol">&colon; </code><code class="primitive">string</code><code class="symbol">, </code><code class="key">redirectURI</code><code class="symbol">&colon; </code><code class="primitive">string</code><code class="symbol"> &rcub;</code>, req: <code class="type">Request</code>) => <code class="primitive">Promise</code><code class="symbol">&lt;</code><code class="primitive">boolean</code><code class="symbol">&gt;</code></code></p>
 - <p>[<code class="key">select?</code>](#issuerinput.select) <code class="primitive">(providers: <code class="primitive">Record</code><code class="symbol">&lt;</code><code class="primitive">string</code>, <code class="primitive">string</code><code class="symbol">&gt;</code>, req: <code class="type">Request</code>) => <code class="primitive">Promise</code><code class="symbol">&lt;</code><code class="type">Response</code><code class="symbol">&gt;</code></code></p>
 - <p>[<code class="key">success</code>](#issuerinput.success) <code class="primitive">(response: [<code class="type">OnSuccessResponder</code>](#onsuccessresponder), input: <code class="type">Result</code>, req: <code class="type">Request</code>) => <code class="primitive">Promise</code><code class="symbol">&lt;</code><code class="type">Response</code><code class="symbol">&gt;</code></code></p>
@@ -306,9 +308,9 @@ Set the TTL, in seconds, for access and refresh tokens.
 </Section>
 
 <InlineSection>
-**Default** 60 * 60 * 24 * 30
+**Default** 30d
 </InlineSection>
-The TTL for access tokens.
+Interval in seconds where the access token is valid.
 </Segment>
 <NestedTitle id="ttl.refresh" Tag="h5" parent="IssuerInput.ttl.">refresh?</NestedTitle>
 <Segment>
@@ -319,9 +321,36 @@ The TTL for access tokens.
 </Section>
 
 <InlineSection>
-**Default** 60 * 60 * 24 * 365
+**Default** 1y
 </InlineSection>
-The TTL for refresh tokens.
+Interval in seconds where the refresh token is valid.
+</Segment>
+<NestedTitle id="ttl.retention" Tag="h5" parent="IssuerInput.ttl.">retention?</NestedTitle>
+<Segment>
+<Section type="parameters">
+<InlineSection>
+**Type** <code class="primitive">number</code>
+</InlineSection>
+</Section>
+
+<InlineSection>
+**Default** 0s
+</InlineSection>
+Interval in seconds to retain refresh tokens for reuse detection.
+</Segment>
+<NestedTitle id="ttl.reuse" Tag="h5" parent="IssuerInput.ttl.">reuse?</NestedTitle>
+<Segment>
+<Section type="parameters">
+<InlineSection>
+**Type** <code class="primitive">number</code>
+</InlineSection>
+</Section>
+
+<InlineSection>
+**Default** 60s
+</InlineSection>
+Interval in seconds where refresh token reuse is allowed. This helps mitigrate
+concurrency issues.
 </Segment>
 <NestedTitle id="issuerinput.allow" Tag="h4" parent="IssuerInput.">allow?</NestedTitle>
 <Segment>

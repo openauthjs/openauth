@@ -45,7 +45,7 @@ const DEFAULT_COPY = {
   /**
    * Copy informing that the pin code will be emailed.
    */
-  code_info: "We'll send a pin code to your email",
+  code_info: "We'll send a pin code to your email.",
   /**
    * Copy for the pin code input.
    */

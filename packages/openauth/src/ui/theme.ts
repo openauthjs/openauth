@@ -180,6 +180,28 @@ export interface Theme {
 }
 
 /**
+ * Built-in default OpenAuth theme.
+ */
+export const THEME_OPENAUTH: Theme = {
+  title: "OpenAuth",
+  radius: "none",
+  background: {
+    dark: "black",
+    light: "white",
+  },
+  primary: {
+    dark: "white",
+    light: "black",
+  },
+  font: {
+    family: "IBM Plex Sans, sans-serif",
+  },
+  css: `
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&display=swap');
+  `,
+}
+
+/**
  * Built-in theme based on [Terminal](https://terminal.shop).
  */
 export const THEME_TERMINAL: Theme = {
@@ -293,5 +315,5 @@ export function setTheme(value: Theme) {
  */
 export function getTheme() {
   // @ts-ignore
-  return globalThis.OPENAUTH_THEME || THEME_SST
+  return globalThis.OPENAUTH_THEME || THEME_OPENAUTH
 }

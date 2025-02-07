@@ -1,7 +1,6 @@
 # React SPA Auth
 
-This uses the token + pkce flow to authenticate a user.
-Start it using.
+This uses the token + pkce flow to authenticate a user. Start it using.
 
 ```bash
 bun run dev

@@ -190,7 +190,6 @@ export async function setTokens(access: string, refresh: string) {
     maxAge: 34560000,
   })
 }
-
 ```
 
 Here we are _linking_ to our auth server. And once the user is authenticated, we'll be saving their access and refresh tokens in _http only_ cookies.
